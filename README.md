@@ -2,16 +2,15 @@
 
 Template para projetos em typescript
 
-
 ## Desenvolvimento
 
 ### Pre-requisitos
 
 Para utilizar este projeto você precisará ter os seguintes softwares instalados:
 
-- Docker 19.x ou superior;
-- Nodejs versão 16.x (especifica);
-- VSCode ou Neovim;
+-   Docker 19.x ou superior;
+-   Nodejs versão 16.x (especifica);
+-   VSCode ou Neovim
 
 ### Ambiente
 
