@@ -1,6 +1,6 @@
 {
     "name": "server",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -16,6 +16,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/amqplib": "^0.10.4",
         "@types/cors": "^2.8.17",
         "@types/debug": "^4.1.12",
         "@types/express": "^4.17.21",
@@ -38,6 +39,8 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
+        "@sentry/node": "^7.87.0",
+        "amqplib": "^0.10.3",
         "axios": "^1.6.2",
         "cors": "^2.8.5",
         "dayjs": "^1.11.10",

@@ -9,14 +9,23 @@ import timezone from 'dayjs/plugin/timezone';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { nanoid } from 'nanoid';
 import { Server } from 'socket.io';
-import type { SocketLogin } from './types';
-import { PORT, TOKEN_ADMINS, TOKEN_CREATORS } from './constants';
+import type { CreatorsPresignedEnvelope, SocketLogin } from './types';
+import {
+    PORT,
+    RABBITMQ_EXCHANGE_CREATORS,
+    TOKEN_ADMINS,
+    TOKEN_CREATORS,
+} from './constants';
+import { getChannel } from './services/rabbitmq';
+import { captureException } from './services/sentry';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const logger = debug('core');
+const uniqueId = nanoid();
 const app = express();
 const httpServer = createServer(app);
 
@@ -43,6 +52,7 @@ io.on('connection', (socket) => {
 
     socket.on('login', (data: SocketLogin) => {
         socket.data.id = data.id;
+        socket.data.email = data.email;
 
         if (data.token === TOKEN_ADMINS) {
             socket.data.type = 'admin';
@@ -56,6 +66,7 @@ io.on('connection', (socket) => {
                         event: 'connect',
                         type: s.data.type,
                         id: s.data.id,
+                        email: s.data.email,
                         from: s.data.when.toISOString(),
                         ip: s.data.ip,
                     });
@@ -73,6 +84,7 @@ io.on('connection', (socket) => {
                 event: 'connect',
                 type: socket.data.type,
                 id: socket.data.id,
+                email: socket.data.email,
                 from: socket.data.when.toISOString(),
                 ip: socket.data.ip,
             });
@@ -103,6 +115,49 @@ io.on('connection', (socket) => {
         }
         logger(`Client disconnected: ${socket.id}`);
     });
+});
+
+export const start = async () => {
+    const channel = await getChannel();
+    const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets.${uniqueId}`;
+
+    channel?.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
+        durable: true,
+    });
+    channel?.assertQueue(logQueue, { durable: false });
+    channel?.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'presignedURL');
+
+    channel?.consume(logQueue, async (message) => {
+        if (!message) return;
+
+        try {
+            // parse envelope
+            const parsedMessage = JSON.parse(
+                message.content.toString().trim()
+            ) as CreatorsPresignedEnvelope;
+
+            const sockets = await io.sockets.in('creators').fetchSockets();
+            sockets.forEach((socket) => {
+                if (socket.data.id === parsedMessage.creatorId) {
+                    socket.emit('presignedURL', {
+                        presignedURL: parsedMessage.presignedURL,
+                    });
+                }
+            });
+
+            channel?.ack(message);
+            return;
+        } catch (parsingError) {
+            captureException(parsingError);
+        }
+        channel?.nack(message);
+    });
+};
+
+start().catch((error) => {
+    logger('Rabbitmq failed to start');
+    captureException(error);
+    process.exit(1);
 });
 
 httpServer.listen(PORT, () => {
