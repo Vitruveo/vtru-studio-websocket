@@ -1,20 +1,19 @@
-# Introdução
+# Introduction
 
-Template para projetos em typescript
+Server websocket
 
-## Desenvolvimento
+## Development
 
-### Pre-requisitos
+### Prerequisites
 
-Para utilizar este projeto você precisará ter os seguintes softwares instalados:
+To use this project, you will need the following software installed:
 
--   Docker 19.x ou superior;
--   Nodejs versão 16.x (especifica);
--   VSCode ou Neovim
+-   Node.js version 16.x (specific);
+-   VSCode or Neovim.
 
-### Ambiente
+### Environment
 
-Para inicializar o ambiente de desenvolvimento, utilize:
+To initialize the development environment, use:
 
 ```sh
 npm install
