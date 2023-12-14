@@ -1,12 +1,14 @@
-import { Socket } from 'socket.io';
-
 import { login } from './login';
 import { logout } from './logout';
+import type {
+    FeaturesOnConnectionParams,
+    FeaturesOnDisconnectParams,
+} from './types';
 
-export const featuresOnConnection = ({ socket }: { socket: Socket }) => [
-    login({ socket }),
-];
+export const featuresOnConnection = ({
+    socket,
+}: FeaturesOnConnectionParams) => [login({ socket })];
 
-export const featuresOnDisconnect = ({ socket }: { socket: Socket }) => [
-    logout({ socket }),
-];
+export const featuresOnDisconnect = ({
+    socket,
+}: FeaturesOnDisconnectParams) => [logout({ socket })];

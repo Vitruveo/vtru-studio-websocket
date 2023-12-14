@@ -1,14 +1,13 @@
 // This eslint rule is disabled because we need to use the "data" property on socket (to persist)
 /* eslint-disable no-param-reassign */
 import debug from 'debug';
-import { Socket } from 'socket.io';
 import { io } from '../../services';
 import { TOKEN_ADMINS, TOKEN_CREATORS } from '../../constants';
-import { SocketLogin } from './types';
-
-interface LoginParams {
-    socket: Socket;
-}
+import type {
+    LoginParams,
+    MonitorCreatorsEmitParams,
+    SocketLogin,
+} from './types';
 
 const logger = debug('features:login');
 
@@ -32,7 +31,7 @@ export const login = ({ socket }: LoginParams) => {
                         email: s.data.email,
                         from: s.data.when.toISOString(),
                         ip: s.data.ip,
-                    });
+                    } as MonitorCreatorsEmitParams);
                 });
             });
             socket.on('unsubscribeCreatorsOnline', () => {
@@ -50,7 +49,7 @@ export const login = ({ socket }: LoginParams) => {
                 email: socket.data.email,
                 from: socket.data.when.toISOString(),
                 ip: socket.data.ip,
-            });
+            } as MonitorCreatorsEmitParams);
         }
         logger(`${socket.data.type} ${data.id} connected`);
     });

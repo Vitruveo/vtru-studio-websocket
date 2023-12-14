@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
-import { Socket } from 'socket.io';
 import { io } from '../../services';
-
-interface LogoutParams {
-    socket: Socket;
-}
+import type { LogoutParams, MonitorAdminEmitParams } from './types';
 
 export const logout = ({ socket }: LogoutParams) => {
     if (socket.data.type === 'admin') {
@@ -15,7 +11,7 @@ export const logout = ({ socket }: LogoutParams) => {
             from: socket.data.when.toISOString(),
             timestamp: dayjs().toISOString(),
             ip: socket.data.ip,
-        });
+        } as MonitorAdminEmitParams);
     }
     if (socket.data.type === 'creator') {
         io.to('monitorCreators').emit('monitorCreators', {
@@ -25,6 +21,6 @@ export const logout = ({ socket }: LogoutParams) => {
             from: socket.data.when.toISOString(),
             timestamp: dayjs().toISOString(),
             ip: socket.data.ip,
-        });
+        } as MonitorAdminEmitParams);
     }
 };

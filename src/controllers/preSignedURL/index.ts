@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { AssetEnvelope } from '../types';
+import type { AssetEnvelope } from '../types';
 import { RABBITMQ_EXCHANGE_CREATORS } from '../../constants';
 import { getChannel } from '../../services/rabbitmq';
 import { captureException } from '../../services/sentry';
@@ -31,6 +31,7 @@ export const start = async () => {
                 if (socket.data.id === parsedMessage.creatorId) {
                     socket.emit('preSignedURL', {
                         preSignedURL: parsedMessage.preSignedURL,
+                        transactionId: parsedMessage.transactionId,
                     });
                 }
             });
