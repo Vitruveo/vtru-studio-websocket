@@ -1,7 +1,7 @@
 import debug from 'debug';
 import * as preSignedURL from './preSignedURL';
 
-const logger = debug('core:controllers');
+const logger = debug('controllers');
 
 export const controllersStart = async () => {
     await preSignedURL.start();

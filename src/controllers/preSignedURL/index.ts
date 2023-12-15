@@ -7,6 +7,7 @@ import { io } from '../../services';
 
 const uniqueId = nanoid();
 
+// TODO: implement dead-letter queue
 export const start = async () => {
     const channel = await getChannel();
     const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets.${uniqueId}`;

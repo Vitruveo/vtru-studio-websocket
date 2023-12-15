@@ -14,8 +14,6 @@ const io = new Server(httpServer, {
     },
 });
 
-// FIXME: type properly the entire app
-// FIXME: create a consistent message type to emit (to validate if we had forget to send some field)
 io.on('connection', (socket) => {
     socket.data.when = dayjs();
     socket.data.ip =

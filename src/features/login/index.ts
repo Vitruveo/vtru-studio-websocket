@@ -15,8 +15,18 @@ export const login = ({ socket }: LoginParams) => {
     socket.on('login', (data: SocketLogin) => {
         socket.data.id = data.id;
         socket.data.email = data.email;
-
-        if (data.token === TOKEN_ADMINS) {
+        if (data.token === TOKEN_CREATORS) {
+            socket.data.type = 'creator';
+            socket.join('creators');
+            io.to('monitorCreators').emit('monitorCreators', {
+                event: 'connect',
+                type: socket.data.type,
+                id: socket.data.id,
+                email: socket.data.email,
+                from: socket.data.when.toISOString(),
+                ip: socket.data.ip,
+            } as MonitorCreatorsEmitParams);
+        } else if (data.token === TOKEN_ADMINS) {
             socket.data.type = 'admin';
 
             // on-demand
@@ -39,17 +49,6 @@ export const login = ({ socket }: LoginParams) => {
             });
 
             socket.join('admins');
-        } else if (data.token === TOKEN_CREATORS) {
-            socket.data.type = 'creator';
-            socket.join('creators');
-            io.to('monitorCreators').emit('monitorCreators', {
-                event: 'connect',
-                type: socket.data.type,
-                id: socket.data.id,
-                email: socket.data.email,
-                from: socket.data.when.toISOString(),
-                ip: socket.data.ip,
-            } as MonitorCreatorsEmitParams);
         }
         logger(`${socket.data.type} ${data.id} connected`);
     });

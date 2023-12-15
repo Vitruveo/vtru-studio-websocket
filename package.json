@@ -1,11 +1,12 @@
 {
     "name": "server",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "",
     "main": "index.js",
     "scripts": {
         "test": "jest --detectOpenHandles --coverage",
-        "start": "nodemon src/index.ts",
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.ts",
         "lint": "eslint --fix src/**/*.ts",
         "prepare": "husky install",
         "postlint": "tsc --noEmit -p tsconfig.json",
