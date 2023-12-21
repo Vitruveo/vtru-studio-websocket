@@ -1,6 +1,6 @@
 {
-    "name": "server",
-    "version": "1.0.6",
+    "name": "vtru-studio-websocket",
+    "version": "1.0.7",
     "description": "",
     "main": "index.js",
     "scripts": {
