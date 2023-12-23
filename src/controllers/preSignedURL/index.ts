@@ -33,6 +33,7 @@ export const start = async () => {
                     socket.emit('preSignedURL', {
                         preSignedURL: parsedMessage.preSignedURL,
                         transactionId: parsedMessage.transactionId,
+                        path: parsedMessage.path,
                     });
                 }
             });
