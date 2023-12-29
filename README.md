@@ -17,5 +17,7 @@ To initialize the development environment, use:
 
 ```sh
 npm install
-npm run dev 
+npm run dev
 ```
+
+### force push
