@@ -34,6 +34,7 @@ export const start = async () => {
                         preSignedURL: parsedMessage.preSignedURL,
                         transactionId: parsedMessage.transactionId,
                         path: parsedMessage.path,
+                        origin: parsedMessage.origin
                     });
                 }
             });

@@ -3,4 +3,5 @@ export interface AssetEnvelope {
     creatorId: string;
     transactionId: string;
     path: string;
+    origin: string;
 }
