@@ -10,6 +10,7 @@ const uniqueId = nanoid();
 // TODO: implement dead-letter queue
 export const start = async () => {
     const channel = await getChannel();
+
     const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets.${uniqueId}`;
 
     channel?.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
@@ -34,7 +35,7 @@ export const start = async () => {
                         preSignedURL: parsedMessage.preSignedURL,
                         transactionId: parsedMessage.transactionId,
                         path: parsedMessage.path,
-                        origin: parsedMessage.origin
+                        origin: parsedMessage.origin,
                     });
                 }
             });

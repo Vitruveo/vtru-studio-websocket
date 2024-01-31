@@ -1,12 +1,12 @@
 {
     "name": "vtru-studio-websocket",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "",
     "main": "index.js",
     "scripts": {
         "test": "jest --detectOpenHandles --coverage",
         "start": "node src/index.js",
-        "dev": "nodemon src/index.ts",
+        "dev": "nodemon --exitcrash src/index.ts",
         "lint": "eslint --fix src/**/*.ts",
         "prepare": "husky install",
         "postlint": "tsc --noEmit -p tsconfig.json",
