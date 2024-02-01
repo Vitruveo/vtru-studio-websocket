@@ -4,4 +4,5 @@ export interface AssetEnvelope {
     transactionId: string;
     path: string;
     origin: string;
+    method: 'PUT' | 'DELETE';
 }

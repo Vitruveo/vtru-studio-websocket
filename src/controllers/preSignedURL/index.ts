@@ -36,6 +36,7 @@ export const start = async () => {
                         transactionId: parsedMessage.transactionId,
                         path: parsedMessage.path,
                         origin: parsedMessage.origin,
+                        method: parsedMessage.method,
                     });
                 }
             });
