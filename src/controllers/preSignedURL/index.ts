@@ -17,9 +17,18 @@ export const start = async () => {
         durable: true,
     });
     channel?.assertQueue(logQueue, { durable: false });
+
+    console.log(
+        'Channel',
+        channel,
+        'RABBITMQ_EXCHANGE_CREATORS',
+        RABBITMQ_EXCHANGE_CREATORS
+    );
+
     channel?.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'preSignedURL');
 
     channel?.consume(logQueue, async (message) => {
+        console.log('message received:', message);
         if (!message) return;
 
         try {

@@ -21,6 +21,7 @@ export const login = ({ socket }: LoginParams) => {
              Token admins: ${TOKEN_ADMINS}`
         );
         if (data.token === TOKEN_CREATORS) {
+            console.log('Token is valid');
             socket.data.type = 'creator';
             socket.join('creators');
             io.to('monitorCreators').emit('monitorCreators', {
