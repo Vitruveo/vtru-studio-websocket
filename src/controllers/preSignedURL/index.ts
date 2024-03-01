@@ -29,7 +29,16 @@ export const start = async () => {
             ) as AssetEnvelope;
 
             const sockets = await io.sockets.in('creators').fetchSockets();
+
+            console.log('Sockets connected:', sockets);
+
             sockets.forEach((socket) => {
+                console.log(
+                    'socket.data.id:',
+                    socket.data.id,
+                    'parsedMessage.creatorId:',
+                    parsedMessage.creatorId
+                );
                 if (socket.data.id === parsedMessage.creatorId) {
                     socket.emit('preSignedURL', {
                         preSignedURL: parsedMessage.preSignedURL,
