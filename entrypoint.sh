@@ -9,12 +9,17 @@ function checkEnv() {
 	fi
 }
 
-if [ "x$@" = "xwait" ]; then
-	checkEnv RABBITMQ_HOST rabbitmq
-	checkEnv RABBITMQ_PORT 5672
-	node tools/wait.js $RABBITMQ_HOST $RABBITMQ_PORT
-
-	if [ "x$NODE_ENV" = "xproduction" ] || [ "x$NODE_ENV" = "xqa" ]; then
+params="$@"
+if [ "x$params" = "xwait" ]; then
+	if [ "x$RABBITMQ_PORT" = "x" ]; then
+		export RABBITMQ_PORT=5672
+	fi
+	if [ "x$RABBITMQ_HOST" = "x" ]; then
+		echo RABBITMQ_HOST não definido
+	else
+		node tools/wait.js $RABBITMQ_HOST $RABBITMQ_PORT
+	fi
+	if [ "x$NODE_ENV" = "xproduction" ]; then
 		while true; do
 			date
 			npm start
