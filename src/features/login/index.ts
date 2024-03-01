@@ -15,8 +15,10 @@ export const login = ({ socket }: LoginParams) => {
     socket.on('login', (data: SocketLogin) => {
         socket.data.id = data.id;
         socket.data.email = data.email;
-        logger(
-            `Token received: ${data.token} Token creators: ${TOKEN_CREATORS} Token admins: ${TOKEN_ADMINS}`
+        console.log(
+            `Token received: ${data.token}
+             Token creators: ${TOKEN_CREATORS} 
+             Token admins: ${TOKEN_ADMINS}`
         );
         if (data.token === TOKEN_CREATORS) {
             socket.data.type = 'creator';
