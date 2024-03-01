@@ -9,7 +9,8 @@ function checkEnv() {
 	fi
 }
 
-if [ "x$@" = "xwait" ] ; then
+params="$@"
+if [ "x$params" = "xwait" ]; then
     if [ "x$RABBITMQ_PORT" = "x" ] ; then
         export RABBITMQ_PORT=5672
     fi
