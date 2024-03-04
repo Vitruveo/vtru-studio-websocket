@@ -16,16 +16,12 @@ export const start = async () => {
     channel?.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
         durable: true,
     });
+
     channel?.assertQueue(logQueue, { durable: false });
 
-    console.log(
-        'Channel',
-        channel,
-        'RABBITMQ_EXCHANGE_CREATORS',
-        RABBITMQ_EXCHANGE_CREATORS
-    );
-
     channel?.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'preSignedURL');
+
+    console.log(channel);
 
     channel?.consume(logQueue, async (message) => {
         console.log('message received:', message);
