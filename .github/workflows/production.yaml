@@ -2,7 +2,7 @@ name: Deploy Websockets for Production
 
 on:
     push:
-        branches: [main]
+        branches: [production]
         paths:
             - .github/workflows/*.yaml
             - src/**/*.ts
