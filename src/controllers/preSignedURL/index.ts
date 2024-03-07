@@ -21,8 +21,6 @@ export const start = async () => {
 
     channel?.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'preSignedURL');
 
-    console.log(channel);
-
     channel?.consume(logQueue, async (message) => {
         console.log('message received:', message);
         if (!message) return;

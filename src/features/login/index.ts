@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 import debug from 'debug';
 import { io } from '../../services';
-import { TOKEN_ADMINS, TOKEN_CREATORS } from '../../constants';
+import { RABBITMQ_URL, TOKEN_ADMINS, TOKEN_CREATORS } from '../../constants';
 import type {
     LoginParams,
     MonitorCreatorsEmitParams,
@@ -16,7 +16,11 @@ export const login = ({ socket }: LoginParams) => {
         socket.data.id = data.id;
         socket.data.email = data.email;
         console.log(
-            `Token received: ${data.token}
+            `
+            RabbitMQ PORT: ${process.env.RABBITMQ_PORT}
+            RabbitMQ HOST: ${process.env.RABBITMQ_HOST}
+            RABBITMQ_URL: ${RABBITMQ_URL}
+            Token received: ${data.token}
              Token creators: ${TOKEN_CREATORS} 
              Token admins: ${TOKEN_ADMINS}`
         );
