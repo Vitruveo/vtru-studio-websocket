@@ -18,6 +18,10 @@ export const controllersStart = async () => {
         setTimeout(controllersStart, 10000);
     });
 
+    rabbitmqStatus.connection.on('error', (error) => {
+        console.error('Error occurred in RabbitMQ connection:', error);
+    });
+
     await preSignedURL.start();
     await notify.start();
 };
