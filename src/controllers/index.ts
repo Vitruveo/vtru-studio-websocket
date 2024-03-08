@@ -8,13 +8,13 @@ const logger = debug('controllers');
 export const controllersStart = async () => {
     const rabbitmqStatus = await getConnection();
     if (!rabbitmqStatus.isConnected || !rabbitmqStatus.connection) {
-        logger('RabbitMQ connection failed, retrying in 10 seconds...');
+        console.log('RabbitMQ connection failed, retrying in 10 seconds...');
         setTimeout(controllersStart, 10000);
         return;
     }
 
     rabbitmqStatus.connection.on('close', () => {
-        logger('RabbitMQ connection closed, restarting in 10 seconds...');
+        console.log('RabbitMQ connection closed, restarting in 10 seconds...');
         setTimeout(controllersStart, 10000);
     });
 

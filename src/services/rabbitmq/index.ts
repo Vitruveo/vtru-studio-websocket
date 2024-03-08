@@ -25,6 +25,16 @@ export const getConnection = async () => {
     try {
         if (!status.connection) {
             status.connection = await rabbitmq.connect(RABBITMQ_URL);
+            status.connection.on('close', () => {
+                status.isConnected = false;
+                status.connection = null;
+                console.error('RabbitMQ connection closed');
+            });
+            status.connection.on('error', (error) => {
+                status.isConnected = false;
+                status.connection = null;
+                console.error('Error occurred in RabbitMQ connection:', error);
+            });
             status.isConnected = true;
         }
     } catch (err) {
