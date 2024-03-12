@@ -30,7 +30,10 @@ export const start = async () => {
                 message.content.toString().trim()
             ) as NotifyEnvelope;
 
+            console.log(parsedMessage);
+
             const sockets = await io.sockets.in('creators').fetchSockets();
+
             sockets.forEach((socket) => {
                 if (socket.data.id === parsedMessage.creatorId) {
                     socket.emit('userNotification', {
