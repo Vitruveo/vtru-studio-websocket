@@ -60,6 +60,8 @@ export const getChannel = async () => {
         process.exit(1);
     } catch (error) {
         captureException(error, { tags: { scope: 'rabbitmq' } });
+
+        process.exit(1);
     }
     return null;
 };

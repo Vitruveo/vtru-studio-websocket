@@ -10,6 +10,10 @@ const uniqueId = nanoid();
 export const start = async () => {
     const channel = await getChannel();
 
+    channel?.on('close', () => {
+        process.exit(1);
+    })
+
     const notificationQueue = `${RABBITMQ_EXCHANGE_CREATORS}.notifications.${uniqueId}`;
 
     channel?.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
