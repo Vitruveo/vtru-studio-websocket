@@ -6,21 +6,7 @@ import { getConnection } from '../services';
 const logger = debug('controllers');
 
 export const controllersStart = async () => {
-    const rabbitmqStatus = await getConnection();
-    if (!rabbitmqStatus.isConnected || !rabbitmqStatus.connection) {
-        console.log('RabbitMQ connection failed, retrying in 10 seconds...');
-        setTimeout(controllersStart, 10000);
-        return;
-    }
-
-    rabbitmqStatus.connection.on('close', () => {
-        console.log('RabbitMQ connection closed, restarting in 10 seconds...');
-        setTimeout(controllersStart, 10000);
-    });
-
-    rabbitmqStatus.connection.on('error', (error) => {
-        console.error('Error occurred in RabbitMQ connection:', error);
-    });
+    await getConnection();
 
     await preSignedURL.start();
     await notify.start();

@@ -10,5 +10,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const logger = debug('core:');
+debug.enable('core:*,services:*,controllers:*');
 
 logger('Starting websocket server');
