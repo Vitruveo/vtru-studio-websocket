@@ -56,7 +56,7 @@ export const getChannel = async () => {
             return connection.createChannel();
         }
 
-        // if connection is null.
+        // if connection is null
         process.exit(1);
     } catch (error) {
         captureException(error, { tags: { scope: 'rabbitmq' } });
