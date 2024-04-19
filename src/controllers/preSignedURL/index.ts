@@ -2,7 +2,7 @@ import debug from 'debug';
 import { nanoid } from 'nanoid';
 import type { AssetEnvelope } from '../types';
 import { RABBITMQ_EXCHANGE_CREATORS } from '../../constants';
-import { getChannel } from '../../services/rabbitmq';
+import { disconnect, getChannel } from '../../services/rabbitmq';
 import { captureException } from '../../services/sentry';
 import { io } from '../../services';
 
@@ -30,15 +30,12 @@ export const start = async () => {
     logger('Channel controller preSignedURL started');
 
     const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets.${uniqueId}`;
-
+    logger('logQueue', logQueue);
     channel.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
         durable: true,
     });
-
     channel.assertQueue(logQueue, { durable: false });
-
     channel.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'preSignedURL');
-
     channel.consume(logQueue, async (message) => {
         console.log('message received:', message);
         if (!message) return;
@@ -77,5 +74,13 @@ export const start = async () => {
             captureException(parsingError);
         }
         channel.nack(message);
+    });
+
+    process.once('SIGINT', async () => {
+        logger(`Deleting queue ${logQueue}`);
+        await channel.deleteQueue(logQueue);
+
+        // disconnect from RabbitMQ
+        await disconnect();
     });
 };

@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { nanoid } from 'nanoid';
 import { RABBITMQ_EXCHANGE_CREATORS } from '../../constants';
-import { getChannel } from '../../services/rabbitmq';
+import { disconnect, getChannel } from '../../services/rabbitmq';
 import { captureException } from '../../services/sentry';
 import { io } from '../../services';
 import { NotifyEnvelope } from './types';
@@ -28,19 +28,14 @@ export const start = async () => {
 
     logger('Channel controller notify started');
 
-    const notificationQueue = `${RABBITMQ_EXCHANGE_CREATORS}.notifications.${uniqueId}`;
-
+    const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.notifications.${uniqueId}`;
+    logger('logQueue', logQueue);
     channel.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
         durable: true,
     });
-    channel.assertQueue(notificationQueue, { durable: false });
-    channel.bindQueue(
-        notificationQueue,
-        RABBITMQ_EXCHANGE_CREATORS,
-        'userNotification'
-    );
-
-    channel.consume(notificationQueue, async (message) => {
+    channel.assertQueue(logQueue, { durable: false });
+    channel.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'userNotification');
+    channel.consume(logQueue, async (message) => {
         if (!message) return;
 
         try {
@@ -67,5 +62,13 @@ export const start = async () => {
             captureException(parsingError);
         }
         channel.nack(message);
+    });
+
+    process.once('SIGINT', async () => {
+        logger(`Deleting queue ${logQueue}`);
+        await channel.deleteQueue(logQueue);
+
+        // disconnect from RabbitMQ
+        await disconnect();
     });
 };
