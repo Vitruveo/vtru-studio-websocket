@@ -1,5 +1,4 @@
 import debug from 'debug';
-import { nanoid } from 'nanoid';
 import type { AssetEnvelope } from '../types';
 import { RABBITMQ_EXCHANGE_CREATORS } from '../../constants';
 import { disconnect, getChannel } from '../../services/rabbitmq';
@@ -7,8 +6,6 @@ import { captureException } from '../../services/sentry';
 import { io } from '../../services';
 
 const logger = debug('controllers:preSignedURL');
-
-const uniqueId = nanoid();
 
 // TODO: implement dead-letter queue
 export const start = async () => {
@@ -29,34 +26,36 @@ export const start = async () => {
 
     logger('Channel controller preSignedURL started');
 
-    const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets.${uniqueId}`;
-    logger('logQueue', logQueue);
+    const logQueue = `${RABBITMQ_EXCHANGE_CREATORS}.assets`;
+    logger('logQueue', logQueue, 'routingKey', 'preSignedURL');
     channel.assertExchange(RABBITMQ_EXCHANGE_CREATORS, 'topic', {
         durable: true,
     });
     channel.assertQueue(logQueue, { durable: false });
     channel.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'preSignedURL');
     channel.consume(logQueue, async (message) => {
-        console.log('message received:', message);
-        if (!message) return;
+        if (!message) {
+            logger('logQueue', logQueue, 'message', 'No message received');
+            return;
+        }
 
         try {
+            if (message.fields.routingKey !== 'preSignedURL') {
+                channel.nack(message);
+                return;
+            }
+
+            const content = message.content.toString();
+
+            logger('logQueue', logQueue, 'message', content);
             // parse envelope
-            const parsedMessage = JSON.parse(
-                message.content.toString().trim()
-            ) as AssetEnvelope;
+            const parsedMessage = JSON.parse(content.trim()) as AssetEnvelope;
 
             const sockets = await io.sockets.in('creators').fetchSockets();
 
-            console.log('Sockets connected:', sockets);
+            logger('sockets', sockets);
 
             sockets.forEach((socket) => {
-                console.log(
-                    'socket.data.id:',
-                    socket.data.id,
-                    'parsedMessage.creatorId:',
-                    parsedMessage.creatorId
-                );
                 if (socket.data.id === parsedMessage.creatorId) {
                     socket.emit('preSignedURL', {
                         preSignedURL: parsedMessage.preSignedURL,
@@ -77,8 +76,8 @@ export const start = async () => {
     });
 
     process.once('SIGINT', async () => {
-        logger(`Deleting queue ${logQueue}`);
-        await channel.deleteQueue(logQueue);
+        logger(`Closing channel ${logQueue}`);
+        await channel.close();
 
         // disconnect from RabbitMQ
         await disconnect();
