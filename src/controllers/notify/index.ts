@@ -1,15 +1,14 @@
 import debug from 'debug';
 import { nanoid } from 'nanoid';
+
 import { RABBITMQ_EXCHANGE_CREATORS } from '../../constants';
-import { disconnect, getChannel } from '../../services/rabbitmq';
-import { captureException } from '../../services/sentry';
-import { io } from '../../services';
-import { NotifyEnvelope } from './types';
+import { getChannel, disconnect, io } from '../../services';
 
 const logger = debug('controllers:notify');
 
 const uniqueId = nanoid();
 
+// TODO: create dead letter for queue
 export const start = async () => {
     const channel = await getChannel();
 
@@ -35,15 +34,12 @@ export const start = async () => {
     });
     channel.assertQueue(logQueue, { durable: false });
     channel.bindQueue(logQueue, RABBITMQ_EXCHANGE_CREATORS, 'userNotification');
-    channel.consume(logQueue, async (message) => {
-        if (!message) return;
-
+    channel.consume(logQueue, async (data) => {
+        if (!data) return;
         try {
-            const parsedMessage = JSON.parse(
-                message.content.toString().trim()
-            ) as NotifyEnvelope;
+            const parsedMessage = JSON.parse(data.content.toString().trim());
 
-            console.log(parsedMessage);
+            logger('Received message:', parsedMessage);
 
             const sockets = await io.sockets.in('creators').fetchSockets();
 
@@ -56,12 +52,10 @@ export const start = async () => {
                 }
             });
 
-            channel.ack(message);
-            return;
-        } catch (parsingError) {
-            captureException(parsingError);
+            channel.ack(data);
+        } catch (error) {
+            logger('Error occurred in controller notify:', error);
         }
-        channel.nack(message);
     });
 
     process.once('SIGINT', async () => {

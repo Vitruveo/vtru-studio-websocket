@@ -52,8 +52,10 @@ export const start = async () => {
             const parsedMessage = JSON.parse(content.trim()) as AssetEnvelope;
 
             const sockets = await io.sockets.in('creators').fetchSockets();
+            const socketsAdmin = await io.sockets.in('admins').fetchSockets();
 
             logger('sockets', sockets);
+            logger('socketsAdmin', socketsAdmin);
 
             sockets.forEach((socket) => {
                 if (socket.data.id === parsedMessage.creatorId) {
@@ -63,6 +65,16 @@ export const start = async () => {
                         path: parsedMessage.path,
                         origin: parsedMessage.origin,
                         method: parsedMessage.method,
+                    });
+                }
+            });
+
+            socketsAdmin.forEach((socket) => {
+                if (socket.data.id === parsedMessage.userId) {
+                    socket.emit('preSignedURL', {
+                        preSignedURL: parsedMessage.preSignedURL,
+                        transactionId: parsedMessage.transactionId,
+                        path: parsedMessage.path,
                     });
                 }
             });

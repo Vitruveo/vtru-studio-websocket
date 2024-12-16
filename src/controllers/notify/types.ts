@@ -1,5 +1,3 @@
-export interface NotifyEnvelope {
+export interface NotifyEnvelope extends Record<string, unknown> {
     creatorId: string;
-    fileName: string;
-    messageType: string;
 }
